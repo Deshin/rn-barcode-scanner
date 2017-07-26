@@ -19,11 +19,18 @@ import java.util.EnumSet;
 import java.util.Map;
 import javax.annotation.Nullable;
 
+import android.view.Display;
+import android.graphics.Point;
+import android.view.WindowManager;
+import android.content.Context;
+
 public class BarCodeScannerModule extends ReactContextBaseJavaModule {
 
     private static final int REQUEST_SCAN_QR = 789;
     private static final String E_SCAN_CANCELLED = "E_SCAN_CANCELLED";
     private static final String E_ACTIVITY_START_ERROR = "E_ACTIVITY_START_ERROR";
+
+    private Point winSize = new Point();
 
     private Promise mPromise;
     private final ActivityEventListener mActivityEventListener = new BaseActivityEventListener() {
@@ -44,6 +51,10 @@ public class BarCodeScannerModule extends ReactContextBaseJavaModule {
 
     public BarCodeScannerModule(ReactApplicationContext reactContext) {
         super(reactContext);
+        WindowManager wm = (WindowManager)reactContext.getSystemService(Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(winSize);
         reactContext.addActivityEventListener(mActivityEventListener);
     }
 
@@ -92,14 +103,33 @@ public class BarCodeScannerModule extends ReactContextBaseJavaModule {
         }
     }
 
+    @ReactMethod
+    public void openBarCodeScannerWithSize(ReadableArray formats, int width, int height , String title, String tip,
+            Promise promise) {
+        Activity activity = getCurrentActivity();
+        mPromise = promise;
+
+        try {
+            CaptureConfig captureConfig = genCaptureConfig(formats, title, tip, width, height);
+            CaptureActivity.startActivityForResult(getCurrentActivity(), REQUEST_SCAN_QR,
+                    captureConfig);
+        } catch (Exception e) {
+            mPromise.reject(E_ACTIVITY_START_ERROR, "e_activity_start_error");
+            mPromise = null;
+        }
+    }
+
     private CaptureConfig genCaptureConfig(ReadableArray formats, String title, String tip) {
+        return genCaptureConfig(formats, title, tip, winSize.x * (5/8), winSize.y * (5/8));
+    }
+
+    private CaptureConfig genCaptureConfig(ReadableArray formats, String title, String tip, int width, int height) {
         CaptureConfig captureConfig = new CaptureConfig();
         EnumSet<BarcodeFormat> barcodeFormats = EnumSet.noneOf(BarcodeFormat.class);
         if (formats == null || formats.size() == 0) {
             //用户没有设置扫码类型，默认支持二维码
             barcodeFormats.add(BarcodeFormat.QR_CODE);
         } else {
-
             for (int i = 0, len = formats.size(); i < len; i++) {
                 String format = formats.getString(i);
                 BarcodeFormat barcodeFormat = BarcodeFormat.valueOf(format);
@@ -107,11 +137,13 @@ public class BarCodeScannerModule extends ReactContextBaseJavaModule {
             }
         }
 
+        Size scanSize = new Size(width, height);
+
         captureConfig.setDecodeFormats(barcodeFormats);
         captureConfig.setTitle(title);
         captureConfig.setTip(tip);
-        captureConfig.setScannerWindowColor(Color.GREEN);
-        captureConfig.setScannerWindowSize(new Size(500, 500));
+        captureConfig.setScannerWindowColor(Color.BLUE);
+        captureConfig.setScannerWindowSize(scanSize);
         return captureConfig;
     }
 }

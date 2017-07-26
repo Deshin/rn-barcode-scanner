@@ -22,7 +22,7 @@ export const BarFormat: {
 	UPC_A: string,
 	UPC_E: string,
 	UPC_EAN_EXTENSION: string,
-	
+
 } = {
 	QR_CODE: RNBarCodeScanner.QR_CODE,
 	AZTEC: RNBarCodeScanner.AZTEC,
@@ -45,4 +45,8 @@ export const BarFormat: {
 
 export function openBarcodeScanner(formats?: Array<string>, title?: string, tip?: string): Promise<string> {
 	return RNBarCodeScanner.openBarCodeScanner(formats, title, tip);
+}
+
+export function openBarcodeScannerWithSize(formats?: Array<string>, width?: number, height?: number, title?: string, tip?: string): Promise<string> {
+    return RNBarCodeScanner.openBarCodeScannerWithSize(formats, width, height, title, tip);
 }

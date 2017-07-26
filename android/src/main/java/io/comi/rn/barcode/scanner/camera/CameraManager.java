@@ -28,14 +28,17 @@ import io.comi.rn.barcode.scanner.camera.open.OpenCamera;
 import io.comi.rn.barcode.scanner.camera.open.OpenCameraInterface;
 import java.io.IOException;
 
+import android.view.Display;
+import android.view.WindowManager;
+
 public final class CameraManager {
 
     private static final String TAG = CameraManager.class.getSimpleName();
 
     private static final int MIN_FRAME_WIDTH = 240;
     private static final int MIN_FRAME_HEIGHT = 240;
-    private static final int MAX_FRAME_WIDTH = 1200; // = 5/8 * 1920
-    private static final int MAX_FRAME_HEIGHT = 675; // = 5/8 * 1080
+    private static int MAX_FRAME_WIDTH = 1200; // = 5/8 * 1920
+    private static int MAX_FRAME_HEIGHT = 675; // = 5/8 * 1080
 
     private final Context context;
     private final CameraConfigurationManager configManager;
@@ -57,6 +60,13 @@ public final class CameraManager {
     public CameraManager(Context context, CameraConfigurationManager configManager) {
         this.context = context;
         this.configManager = configManager;
+
+        WindowManager wm = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        MAX_FRAME_WIDTH = size.x;
+        MAX_FRAME_HEIGHT = size.y;
 
         previewCallback = new PreviewCallback(configManager);
     }
