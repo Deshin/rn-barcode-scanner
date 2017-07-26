@@ -104,7 +104,11 @@ public class BarCodeScannerModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+<<<<<<< HEAD
     public void openBarCodeScannerWithSize(ReadableArray formats, int width, int height , String title, String tip,
+=======
+    public void openBarCodeScanner(ReadableArray formats, int width, int height , String title, String tip,
+>>>>>>> 57a7b2b2ab33618ac9dc3a8b5c76914a6c3946fc
             Promise promise) {
         Activity activity = getCurrentActivity();
         mPromise = promise;
