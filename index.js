@@ -46,3 +46,7 @@ export const BarFormat: {
 export function openBarcodeScanner(formats?: Array<string>, title?: string, tip?: string): Promise<string> {
 	return RNBarCodeScanner.openBarCodeScanner(formats, title, tip);
 }
+
+export function openBarcodeScanner(formats?: Array<string>, width?: number, height?: number, title?: string, tip?: string): Promise<string> {
+    return RNBarCodeScanner.openBarCodeScanner(formats, width, height, title, tip);
+}
